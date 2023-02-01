@@ -38,6 +38,7 @@ class NoteList extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: (){}),
     );
   }
 }
