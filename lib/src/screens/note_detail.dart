@@ -11,6 +11,14 @@ class NoteDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(note.title),
       ),
+      body: Padding (
+        padding: const EdgeInsets.all(8),
+        child: Column (
+          children: [
+            
+          ],
+        ),
+      ),
     );
   }
 }

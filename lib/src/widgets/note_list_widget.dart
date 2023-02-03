@@ -25,6 +25,7 @@ class NoteListWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(15),
       splashColor: Theme.of(context).colorScheme.primary,
       child: Card(
+        color: Theme.of(context).colorScheme.surfaceVariant,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 5,
         margin: const EdgeInsets.all(5),
