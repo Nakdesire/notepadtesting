@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notepad/src/screens/note_detail.dart';
-import 'package:notepad/src/utils/app_routes.dart';
-import 'screens/note_list.dart';
+import 'screens/note_list_screen.dart';
 import 'utils/color_schemes.dart';
 
 class NotepadApp extends StatelessWidget {
@@ -12,11 +10,32 @@ class NotepadApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-      darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: lightColorScheme,
+        textTheme: theme.textTheme.copyWith(
+          titleLarge: const TextStyle(
+            fontFamily: 'Lato',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: darkColorScheme,
+        textTheme: theme.textTheme.copyWith(
+          titleLarge: const TextStyle(
+            fontFamily: 'Lato',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
       routes: {
-        AppRoutes.noteListScreen: (context) => const NoteList(),
-        AppRoutes.noteDetailScreen: (context) => const NoteDetailScreen(),
+        "/": (context) => const NoteListScreen(),
       },
     );
   }
