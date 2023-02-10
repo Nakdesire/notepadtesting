@@ -12,11 +12,28 @@ class NoteDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
-    String dateUp = DateFormat("dd/MM/yyyy").format(DateTime.now());
+    String dateAt = DateFormat("dd/MM/yyyy").format(DateTime.now());
 
     if (note != null) {
       titleController.text = note!.title;
       bodyController.text = note!.body;
+    }
+
+    save() async {
+      final title = titleController.value.text;
+      final body = bodyController.value.text;
+
+      if (title.isEmpty || body.isEmpty) {
+        return;
+      }
+
+      final Note model =
+          Note(title: title, body: body, id: note?.id, date: dateAt);
+      if (note == null) {
+        await DatabaseHelper.addNote(model);
+      } else {
+        await DatabaseHelper.updateNote(model);
+      }
     }
 
     final PreferredSizeWidget appBar = AppBar(
@@ -26,31 +43,11 @@ class NoteDetailsScreen extends StatelessWidget {
       title: Text(note == null ? 'Nova nota' : 'Editar nota'),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        onPressed: () async {
-          final title = titleController.value.text;
-          final body = bodyController.value.text;
-
-          if (title.isEmpty || body.isEmpty) {
-            return;
-          }
-
-          final Note model =
-              Note(title: title, body: body, id: note?.id, date: dateUp);
-          if (note == null) {
-            await DatabaseHelper.addNote(model);
-          } else {
-            await DatabaseHelper.updateNote(model);
-          }
-
+        onPressed: () {
+          save;
           Navigator.pop(context);
         },
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.delete_forever_rounded),
-          onPressed: () {},
-        )
-      ],
     );
     final Size size = MediaQuery.of(context).size;
 
@@ -66,6 +63,7 @@ class NoteDetailsScreen extends StatelessWidget {
                 children: [
                   TextFormField(
                     onChanged: (value) {},
+                    maxLength: 15,
                     maxLines: null,
                     autofocus: true,
                     controller: titleController,
@@ -73,7 +71,7 @@ class NoteDetailsScreen extends StatelessWidget {
                     textCapitalization: TextCapitalization.sentences,
                     decoration: const InputDecoration(
                       hintText: "Título da nota",
-                      labelText: 'Título?',
+                      labelText: 'Título',
                     ),
                     style: TextStyle(
                       fontSize: 26.0,
@@ -94,7 +92,7 @@ class NoteDetailsScreen extends StatelessWidget {
                       hintText: "Escreva sua nota...",
                     ),
                     style: TextStyle(
-                      fontSize: 20.0,
+                      fontSize: 15.0,
                       color: Theme.of(context).colorScheme.onBackground,
                     ),
                   ),
@@ -105,8 +103,9 @@ class NoteDetailsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.delete_forever_rounded),
-        onPressed: () {},
+        onPressed: save,
+        tooltip: 'Salvar',
+        child: const Icon(Icons.save),
       ),
     );
   }

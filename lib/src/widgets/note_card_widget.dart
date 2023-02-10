@@ -19,8 +19,10 @@ class NoteCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
-      onLongPress: () {},
+      onTap: onTap,
+      onLongPress: onLongPress,
+      borderRadius: BorderRadius.circular(15),
+      splashColor: Theme.of(context).colorScheme.primary,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -31,7 +33,7 @@ class NoteCardWidget extends StatelessWidget {
                 height: cardHeight * 0.65,
                 child: Text(
                   notes.body,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 9,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onBackground,

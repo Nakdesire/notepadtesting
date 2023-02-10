@@ -15,6 +15,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
   DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> notes = [];
   int notesLength = 0;
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -25,8 +26,14 @@ class _NoteListScreenState extends State<NoteListScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.add),
-          onPressed: () {},
-          tooltip: 'Add Note',
+          onPressed: () async {
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NoteDetailsScreen()));
+            setState(() {});
+          },
+          tooltip: 'Nova Nota',
         ),
       ],
     );
@@ -73,8 +80,13 @@ class _NoteListScreenState extends State<NoteListScreen> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text(
-                                        'Você tem certeza que quer deletar essa nota?'),
+                                    title: Text(
+                                      'Você tem certeza que quer deletar essa nota?',
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground),
+                                    ),
                                     actions: [
                                       ElevatedButton(
                                         style: ButtonStyle(
@@ -87,11 +99,11 @@ class _NoteListScreenState extends State<NoteListScreen> {
                                           Navigator.pop(context);
                                           setState(() {});
                                         },
-                                        child: const Text('Yes'),
+                                        child: const Text('Sim'),
                                       ),
                                       ElevatedButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: const Text('No'),
+                                        child: const Text('Não'),
                                       ),
                                     ],
                                   );
@@ -114,7 +126,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               );
             }
             return const Center(
-              child: Text('Nenhuma nota atribuida'),
+              child: Text('Não há notas registradas, crie uma agora mesmo!'),
             );
           }
           return const SizedBox.shrink();
