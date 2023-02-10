@@ -1,55 +1,22 @@
 class Note {
-  late int _id;
-  late String _title;
-  late String _body;
-  late String _date;
+  final int? id;
+  final String title;
+  final String body;
+  final String date;
 
-  Note(this._id, this._title, this._date, this._body);
+  Note({this.id, required this.title, required this.body, required this.date});
 
-  Note.withID(this._title, this._date, this._body);
+  factory Note.fromJson(Map<String, dynamic> json) => Note(
+        id: json['id'],
+        title: json['title'],
+        body: json['body'],
+        date: json['date'],
+      );
 
-  int get id => _id;
-  String get title => _title;
-  String get body => _body;
-  String get date => _date;
-
-  set title(String newTitle) {
-    if (newTitle.length <= 200) {
-      this._title = newTitle;
-    }
-  }
-
-  set body(String newBody) {
-    if (newBody.length <= 200) {
-      this._body = newBody;
-    }
-  }
-
-  set date(String newDate) {
-    this._date = newDate;
-  }
-
-  // convert Object to MAP to save in DB
-  // SQFLITE saves and returns MAP only
-
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{};
-    if (id != 0) {
-      map['id'] = this._id;
-    }
-    map['title'] = this._title;
-    map['body'] = this._body;
-    map['date'] = this._date;
-
-    return map;
-  }
-
-  // extract note Object from MAP
-
-  Note.fromMapObject(Map<String, dynamic> map) {
-    this._id = map['id'];
-    this._title = map['title'];
-    this._body = map['body'];
-    this._date = map['date'];
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'body': body,
+        'date': date,
+      };
 }

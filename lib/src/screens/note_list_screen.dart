@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import '../models/note.dart';
 import '../utils/database_helper.dart';
-import 'note_detail_screen.dart';
+import '../widgets/note_card_widget.dart';
+import 'note_details_screen.dart';
 
 class NoteListScreen extends StatefulWidget {
   const NoteListScreen({super.key});
@@ -17,7 +17,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
   int notesLength = 0;
   @override
   Widget build(BuildContext context) {
-    updateListView();
     final mediaQuery = MediaQuery.of(context);
     final PreferredSizeWidget appBar = AppBar(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -26,15 +25,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.add),
-          onPressed: () => navigateToDetail(
-            Note(
-              0,
-              " ",
-              " ",
-              " ",
-            ),
-            'Nova nota',
-          ),
+          onPressed: () {},
           tooltip: 'Add Note',
         ),
       ],
@@ -51,137 +42,95 @@ class _NoteListScreenState extends State<NoteListScreen> {
 
     return Scaffold(
       appBar: appBar,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(right: 8, left: 8),
-          child: GridView.builder(
-            itemCount: notes.length,
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: availableWidth * 0.48,
-              mainAxisExtent: availableHeight * 0.35,
-              crossAxisSpacing: availableWidth * 0.05,
-              mainAxisSpacing: availableHeight * 0.005,
-            ),
-            itemBuilder: ((context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    navigateToDetail(this.notes[index], 'Edit Note');
-                  },
-                  onLongPress: () {},
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: cardHeight * 0.65,
-                            child: Text(
-                              notes[index].body,
-                              overflow: TextOverflow.fade,
-                              maxLines: 9,
-                              style: TextStyle(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: cardHeight * 0.1,
-                            child: Text(
-                              notes[index].title,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color:
-                                    Theme.of(context).colorScheme.onBackground,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: cardHeight * 0.1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.schedule),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  notes[index].date,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+      body: FutureBuilder<List<Note>?>(
+        future: DatabaseHelper.getAllNotes(),
+        builder: (context, AsyncSnapshot<List<Note>?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()));
+          } else if (snapshot.hasData) {
+            if (snapshot.data != null) {
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8, left: 8),
+                  child: GridView.builder(
+                    itemCount: snapshot.data!.length,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: availableWidth * 0.48,
+                      mainAxisExtent: availableHeight * 0.35,
+                      crossAxisSpacing: availableWidth * 0.05,
+                      mainAxisSpacing: availableHeight * 0.005,
                     ),
+                    itemBuilder: ((context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: NoteCardWidget(
+                          cardHeight: cardHeight,
+                          notes: snapshot.data![index],
+                          onLongPress: () async {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text(
+                                        'Você tem certeza que quer deletar essa nota?'),
+                                    actions: [
+                                      ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red)),
+                                        onPressed: () async {
+                                          await DatabaseHelper.deleteNote(
+                                              snapshot.data![index]);
+                                          Navigator.pop(context);
+                                          setState(() {});
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('No'),
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NoteDetailsScreen(
+                                          note: snapshot.data![index],
+                                        )));
+                            setState(() {});
+                          },
+                        ),
+                      );
+                    }),
                   ),
                 ),
               );
-            }),
-          ),
-        ),
+            }
+            return const Center(
+              child: Text('Nenhuma nota atribuida'),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => navigateToDetail(
-          Note(
-            0,
-            " ",
-            " ",
-            " ",
-          ),
-          'Nova nota',
-        ),
-        tooltip: 'Add Note',
+        onPressed: () async {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const NoteDetailsScreen()));
+          setState(() {});
+        },
+        tooltip: 'Nova Nota',
         child: const Icon(Icons.add),
       ),
     );
-  }
-
-  void _delete(context, Note note) async {
-    int result = await databaseHelper.deleteNote(note.id);
-    if (result != 0) {
-      _showSnackBar(context, 'Nota deletada com sucesso!');
-      updateListView();
-    }
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void navigateToDetail(Note note, String title) async {
-    bool result =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetailScreen(note, title);
-    }));
-
-    if (result == true) {
-      updateListView();
-    }
-  }
-
-  void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
-      noteListFuture.then((noteList) {
-        setState(() {
-          this.notes = noteList;
-          this.notesLength = noteList.length;
-        });
-      });
-    });
   }
 }
