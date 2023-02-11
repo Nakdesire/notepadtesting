@@ -23,19 +23,6 @@ class _NoteListScreenState extends State<NoteListScreen> {
       backgroundColor: Theme.of(context).colorScheme.background,
       title: const Text("Anotações"),
       elevation: 5,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () async {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const NoteDetailsScreen()));
-            setState(() {});
-          },
-          tooltip: 'Nova Nota',
-        ),
-      ],
     );
     final availableHeight = mediaQuery.size.height -
         appBar.preferredSize.height -

@@ -24,6 +24,7 @@ class NoteCardWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(15),
       splashColor: Theme.of(context).colorScheme.primary,
       child: Card(
+        elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

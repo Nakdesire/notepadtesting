@@ -34,6 +34,20 @@ class NoteDetailsScreen extends StatelessWidget {
       } else {
         await DatabaseHelper.updateNote(model);
       }
+
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(
+              'Nota salva com sucesso!',
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onBackground),
+            ),
+          );
+        },
+      );
     }
 
     final PreferredSizeWidget appBar = AppBar(
@@ -53,59 +67,64 @@ class NoteDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: appBar,
-      body: SafeArea(
-        child: Container(
-          height: size.height,
-          padding: const EdgeInsets.all(16),
-          child: Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextFormField(
-                    onChanged: (value) {},
-                    maxLength: 15,
-                    maxLines: null,
-                    autofocus: true,
-                    controller: titleController,
-                    keyboardType: TextInputType.multiline,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      hintText: "Título da nota",
-                      labelText: 'Título',
-                    ),
-                    style: TextStyle(
-                      fontSize: 26.0,
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onBackground,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    onChanged: (value) {},
-                    controller: bodyController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: "Escreva sua nota...",
-                    ),
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      color: Theme.of(context).colorScheme.onBackground,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: noteModify(size, titleController, context, bodyController),
       floatingActionButton: FloatingActionButton(
         onPressed: save,
         tooltip: 'Salvar',
         child: const Icon(Icons.save),
+      ),
+    );
+  }
+
+  SafeArea noteModify(Size size, TextEditingController titleController,
+      BuildContext context, TextEditingController bodyController) {
+    return SafeArea(
+      child: Container(
+        height: size.height,
+        padding: const EdgeInsets.all(16),
+        child: Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  onChanged: (value) {},
+                  maxLength: 15,
+                  maxLines: null,
+                  autofocus: true,
+                  controller: titleController,
+                  keyboardType: TextInputType.multiline,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    hintText: "Título da nota",
+                    labelText: 'Título',
+                  ),
+                  style: TextStyle(
+                    fontSize: 26.0,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  onChanged: (value) {},
+                  controller: bodyController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration.collapsed(
+                    hintText: "Escreva sua nota...",
+                  ),
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
